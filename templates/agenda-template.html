@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{WORKSHOP_TITLE}} — Workshop Agenda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /*
+    "Paper" theme — shared across every workshop agenda this skill produces.
+    Do not restyle per-customer; only content changes between agendas.
+  */
+  :root {
+    --bg: #F5EFE3;
+    --bg-alt: #EFE7D6;
+    --line: rgba(43,36,30,0.16);
+    --terracotta: #B5502E;  --terracotta-soft: rgba(181,80,46,0.12);
+    --dusty-blue: #4E7089;  --dusty-blue-soft: rgba(78,112,137,0.12);
+    --ochre: #A87A21;       --ochre-soft: rgba(168,122,33,0.13);
+    --violet: #7A6A9E;      --violet-soft: rgba(122,106,158,0.12);
+    --text: #2B241E;
+    --text-dim: #6C5F51;
+    --text-faint: #A89A87;
+    --font-h: 'Fraunces', Georgia, serif;
+    --font-b: 'IBM Plex Sans', sans-serif;
+    --font-m: 'IBM Plex Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg); color: var(--text); font-family: var(--font-b);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; overflow: hidden;
+  }
+
+  .toolbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 30px 0 84px; z-index: 20;
+    background: linear-gradient(to bottom, var(--bg) 55%, transparent);
+    transition: left 0.3s ease;
+  }
+  .toolbar .brand { font-family: var(--font-m); font-size: 12.5px; color: var(--text-faint); }
+
+  /* ---------- Collapsible slide menu (left side) ----------
+     Default OPEN. On wide screens an open menu pushes the toolbar,
+     slide viewport, and bottom nav bar over — it never floats on top of
+     them (that covers the title). On narrow screens (<900px) it falls
+     back to a dimmed overlay since there's no room to push content. */
+  .side-menu-toggle {
+    position: fixed; top: 11px; left: 20px; z-index: 31;
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1.5px solid var(--line); background: var(--bg-alt); color: var(--text);
+    font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s ease;
+  }
+  .side-menu-toggle:hover { border-color: var(--terracotta); }
+
+  .side-menu-backdrop {
+    position: fixed; inset: 0; background: rgba(43,36,30,0.18);
+    z-index: 24; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+  }
+  .side-menu-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  .side-menu {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 250px;
+    background: var(--bg-alt); border-right: 1px dotted var(--line);
+    z-index: 25; padding: 78px 16px 20px; overflow-y: auto;
+    transform: translateX(-100%); transition: transform 0.3s ease;
+  }
+  .side-menu.open { transform: translateX(0); }
+  .side-menu-heading {
+    font-family: var(--font-m); font-size: 11px; letter-spacing: 0.03em; text-transform: uppercase;
+    color: var(--text-faint); padding: 0 10px 12px;
+  }
+  .side-menu-item {
+    display: block; width: 100%; text-align: left; background: none; border: none;
+    font-family: var(--font-b); font-size: 14px; color: var(--text-dim);
+    padding: 10px 10px; border-radius: 6px; cursor: pointer; margin-bottom: 2px;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .side-menu-item:hover { background: var(--bg); color: var(--text); }
+  .side-menu-item.active { color: var(--terracotta); font-weight: 600; background: var(--terracotta-soft); }
+
+  /* Slide viewport — nav is buttons/arrow-keys only. Long slides scroll internally
+     via plain overflow-y: auto. Do NOT add wheel/scroll-to-advance handlers. */
+  .viewport { position: relative; height: 100vh; width: 100%; transition: margin-left 0.3s ease, width 0.3s ease; }
+  .slide {
+    position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center;
+    padding: 104px 24px 96px; opacity: 0; transform: translateY(14px); pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.34s ease; overflow-y: auto;
+  }
+  .slide.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .slide-inner { max-width: 760px; width: 100%; margin: auto; }
+
+  .eyebrow {
+    display: inline-block; font-family: var(--font-m); font-size: 12.5px; font-weight: 500;
+    color: var(--terracotta); border: 1.5px solid var(--terracotta);
+    padding: 4px 12px; border-radius: 4px; transform: rotate(-1.5deg);
+    margin-bottom: 22px;
+  }
+
+  h1 { font-family: var(--font-h); font-size: 48px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 18px; }
+  .lede { color: var(--text-dim); font-size: 17px; max-width: 560px; margin-bottom: 44px; }
+  .meta-row { display: flex; gap: 40px; flex-wrap: wrap; padding-top: 28px; border-top: 1px dotted var(--line); }
+  .meta-item .k { font-family: var(--font-m); font-size: 11px; letter-spacing: 0.03em; color: var(--text-faint); margin-bottom: 6px; text-transform: uppercase; }
+  .meta-item .v { font-size: 15px; font-weight: 600; }
+
+  h2 { font-family: var(--font-h); font-size: 34px; font-weight: 600; margin-bottom: 30px; }
+
+  .prereq-list { display: flex; flex-direction: column; }
+  .prereq-item { padding: 17px 0 17px 22px; border-bottom: 1px dotted var(--line); position: relative; }
+  .prereq-item:last-child { border-bottom: none; }
+  .prereq-item::before { content: "✦"; position: absolute; left: 0; top: 17px; color: var(--terracotta); font-size: 11px; }
+  .p-title { font-weight: 600; font-size: 15.5px; margin-bottom: 4px; }
+  .p-desc { color: var(--text-dim); font-size: 14.5px; }
+
+  .journey-list { display: flex; flex-direction: column; }
+  .journey { display: grid; grid-template-columns: 44px 1fr; gap: 16px; padding: 22px 0; border-bottom: 1px dotted var(--line); }
+  .journey:last-child { border-bottom: none; }
+  .journey .num { font-family: var(--font-h); font-style: italic; font-size: 20px; color: var(--terracotta); }
+  .journey h3 { font-family: var(--font-h); font-size: 19px; font-weight: 600; margin-bottom: 6px; }
+  .journey p { color: var(--text-dim); font-size: 14.5px; margin-bottom: 12px; max-width: 520px; }
+  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag { font-family: var(--font-m); font-size: 11px; color: var(--text-dim); border: 1px solid var(--line); padding: 4px 10px; border-radius: 999px; }
+
+  .day-date { font-family: var(--font-m); font-size: 13px; color: var(--text-faint); margin-top: -22px; margin-bottom: 32px; display: block; }
+  .timeline { position: relative; padding-left: 100px; }
+  .timeline::before { content: ""; position: absolute; left: 82px; top: 6px; bottom: 6px; border-left: 2px dotted var(--line); }
+  .t-row { position: relative; padding-bottom: 24px; }
+  .t-row:last-child { padding-bottom: 0; }
+  .t-time { position: absolute; left: -100px; top: 1px; width: 74px; font-family: var(--font-m); font-size: 12px; color: var(--text-faint); text-align: right; }
+  .t-row::after { content: ""; position: absolute; left: -19px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--terracotta); }
+  .t-row.break::after { background: var(--text-faint); }
+  .t-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+  .t-title { font-weight: 600; font-size: 15px; }
+  .t-format { font-family: var(--font-m); font-size: 10.5px; padding: 2px 9px; border-radius: 999px; }
+  .t-format.talk     { color: var(--dusty-blue); background: var(--dusty-blue-soft); }
+  .t-format.build    { color: var(--terracotta); background: var(--terracotta-soft); }
+  .t-format.planning { color: var(--ochre);     background: var(--ochre-soft); }
+  .t-format.retro    { color: var(--violet);    background: var(--violet-soft); }
+  .t-row.break .t-title { color: var(--text-faint); font-weight: 500; }
+  .t-desc { color: var(--text-dim); font-size: 14px; max-width: 480px; }
+  .t-note { color: var(--text-faint); font-size: 12.5px; margin-top: 4px; font-style: italic; }
+
+  .outcome { border-left: 2px solid var(--terracotta); padding: 4px 0 4px 22px; margin-bottom: 28px; }
+  .outcome:last-child { margin-bottom: 0; }
+  .outcome .o-label { font-family: var(--font-m); font-size: 11.5px; color: var(--terracotta); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .outcome p { font-family: var(--font-h); font-size: 18px; color: var(--text); max-width: 620px; }
+
+  /* ---------- Implementation (section 05) — shared with implementation-slide-tabbed.html ---------- */
+  .impl-tags { margin: -14px 0 30px; }
+  .impl-tabs {
+    display: flex; gap: 22px; flex-wrap: wrap;
+    border-bottom: 1px dotted var(--line); margin-bottom: 26px;
+  }
+  .impl-tab-btn {
+    font-family: var(--font-m); font-size: 12.5px; color: var(--text-dim);
+    background: none; border: none; padding: 0 0 10px; cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .impl-tab-btn:hover { color: var(--text); }
+  .impl-tab-btn.active { color: var(--terracotta); border-bottom-color: var(--terracotta); }
+  .impl-tab-panel { display: none; }
+  .impl-tab-panel.active { display: block; }
+
+  .impl-steps { display: flex; flex-direction: column; margin-bottom: 8px; }
+  .impl-step { padding: 16px 0 16px 34px; border-bottom: 1px dotted var(--line); position: relative; }
+  .impl-step:last-child { border-bottom: none; }
+  .impl-step .step-num {
+    position: absolute; left: 0; top: 16px; font-family: var(--font-m); font-size: 12px;
+    color: var(--terracotta); width: 22px;
+  }
+  .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+  .step-desc { color: var(--text-dim); font-size: 14px; max-width: 560px; }
+
+  .code-panel {
+    background: var(--bg-alt); border: 1px dotted var(--line); border-radius: 6px;
+    margin: 12px 0 4px; overflow: hidden;
+  }
+  .code-label {
+    font-family: var(--font-m); font-size: 11px; color: var(--text-faint);
+    padding: 7px 14px; border-bottom: 1px dotted var(--line);
+  }
+  .code-panel pre { margin: 0; padding: 14px 16px; overflow-x: auto; }
+  .code-panel code {
+    font-family: var(--font-m); font-size: 12.5px; line-height: 1.65; color: var(--text);
+    white-space: pre;
+  }
+
+  /* Inline <code> in prose — scoped so it does NOT override .code-panel code blocks above. */
+  p code, li code, td code, .svc-desc code, .diagram-caption code, .concept-block code {
+    font-family: var(--font-m); font-size: 0.85em; color: var(--terracotta);
+    background: var(--terracotta-soft); padding: 1px 6px; border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .screenshot-panel {
+    background: var(--bg-alt); border: 1px dotted var(--line); border-radius: 6px;
+    margin: 12px 0 4px; overflow: hidden;
+  }
+  .screenshot-panel img { display: block; width: 100%; height: auto; }
+  .screenshot-caption {
+    font-family: var(--font-m); font-size: 11px; color: var(--text-faint);
+    padding: 7px 14px; border-top: 1px dotted var(--line);
+  }
+
+  .deck-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 78px;
+    display: flex; align-items: center; justify-content: center; gap: 22px; z-index: 20;
+    background: linear-gradient(to top, var(--bg) 55%, transparent);
+    transition: left 0.3s ease;
+  }
+  .nav-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1.5px solid var(--line); background: var(--bg-alt); color: var(--text);
+    font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s ease, opacity 0.15s ease;
+  }
+  .nav-btn:hover { border-color: var(--terracotta); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .dots { display: flex; gap: 8px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--line); border: none; cursor: pointer; padding: 0; }
+  .dot.active { background: var(--terracotta); }
+  .counter { font-family: var(--font-m); font-size: 12px; color: var(--text-faint); min-width: 46px; text-align: center; }
+
+  @media (min-width: 900px) {
+    .side-menu-backdrop { display: none; }
+    body.menu-open .toolbar { left: 250px; }
+    body.menu-open .viewport { margin-left: 250px; width: calc(100% - 250px); }
+    body.menu-open .deck-nav { left: 250px; }
+  }
+
+  @media (max-width: 640px) {
+    h1 { font-size: 32px; }
+    h2 { font-size: 26px; }
+    .slide { padding: 88px 18px 88px; }
+    .timeline { padding-left: 0; }
+    .timeline::before { display: none; }
+    .t-time { position: static; display: block; margin-bottom: 4px; text-align: left; }
+    .t-row::after { display: none; }
+  }
+
+  @media print {
+    body { overflow: visible; height: auto; }
+    .toolbar, .deck-nav, .side-menu, .side-menu-toggle, .side-menu-backdrop { display: none; }
+    .viewport { height: auto; margin-left: 0 !important; width: 100% !important; }
+    .slide {
+      position: static; opacity: 1 !important; transform: none !important;
+      pointer-events: auto; height: auto; padding: 36px 24px;
+      page-break-after: always;
+    }
+  }
+</style>
+</head>
+<body class="menu-open">
+
+<button class="side-menu-toggle" id="menu-toggle" aria-label="Toggle slide menu">☰</button>
+<div class="side-menu-backdrop" id="menu-backdrop"></div>
+<nav class="side-menu open" id="side-menu">
+  <div class="side-menu-heading">Slides</div>
+  <!-- items injected by script from each slide's data-menu attribute — don't hand-write these -->
+</nav>
+
+<div class="toolbar">
+  <div class="brand">{{WORKSHOP_TITLE}} — Workshop Agenda</div>
+</div>
+
+<div class="viewport" id="viewport">
+
+  <!-- ===== Cover ===== -->
+  <section class="slide active" data-menu="Cover">
+    <div class="slide-inner">
+      <h1>{{WORKSHOP_TITLE}}</h1>
+      <p class="lede">{{BESPOKE_ONE_LINE_SUBTITLE}}</p>
+      <div class="meta-row">
+        <!-- Only include meta-items with real values. Typical: Duration, Location (in-person/hybrid only), Dates, Stack -->
+        <div class="meta-item"><div class="k">Duration</div><div class="v">{{DURATION}}</div></div>
+        <div class="meta-item"><div class="k">Location</div><div class="v">{{LOCATION}}</div></div>
+        <div class="meta-item"><div class="k">Dates</div><div class="v">{{DATES}}</div></div>
+        <div class="meta-item"><div class="k">Stack</div><div class="v">{{STACK}}</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 01 — Prerequisites ===== -->
+  <section class="slide" data-menu="01 Prerequisites">
+    <div class="slide-inner">
+      <div class="eyebrow">01</div>
+      <h2>Prerequisites</h2>
+      <div class="prereq-list">
+        <!-- REPEAT per prerequisite -->
+        <div class="prereq-item">
+          <div class="p-title">{{PREREQ_TITLE}}</div>
+          <div class="p-desc">{{PREREQ_DESC}}</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 02 — Use cases & journeys ===== -->
+  <section class="slide" data-menu="02 Journeys">
+    <div class="slide-inner">
+      <div class="eyebrow">02</div>
+      <h2>Use cases &amp; journeys</h2>
+      <div class="journey-list">
+        <!-- REPEAT per journey, in build order -->
+        <div class="journey">
+          <div class="num">{{JOURNEY_NUM}}</div>
+          <div>
+            <h3>{{JOURNEY_TITLE}}</h3>
+            <p>{{JOURNEY_DESC}}</p>
+            <div class="tag-row">{{PRODUCT_TAGS}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 03 — Agenda · Day N ===== -->
+  <!-- REPEAT: one whole <section class="slide"> per workshop day. Do not merge multiple days into one slide. -->
+  <section class="slide" data-menu="03 Agenda · Day {{DAY_NUM}}">
+    <div class="slide-inner">
+      <div class="eyebrow">03 — Agenda</div>
+      <h2>Day {{DAY_NUM}}</h2>
+      <span class="day-date">{{DAY_THEME}}</span>
+      <div class="timeline">
+        <!-- REPEAT per timeline row. Add class="break" for meals/breaks (no format tag, no invented description). -->
+        <div class="t-row">
+          <div class="t-time">{{START}}–{{END}}</div>
+          <div class="t-head">
+            <span class="t-title">{{SESSION_TITLE}}</span>
+            <span class="t-format {{talk|build|planning|retro}}">{{talk|build|planning|retro}}</span>
+          </div>
+          <div class="t-desc">{{SESSION_DESC}}</div>
+          <!-- Optional: <div class="t-note">{{NOTE}}</div> -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 04 — Outcomes per day ===== -->
+  <section class="slide" data-menu="04 Outcomes">
+    <div class="slide-inner">
+      <div class="eyebrow">04</div>
+      <h2>Outcomes per day</h2>
+      <!-- REPEAT per day -->
+      <div class="outcome">
+        <div class="o-label">End of Day {{DAY_NUM}}</div>
+        <p>{{OUTCOME_STATEMENT}}</p>
+      </div>
+    </div>
+  </section>
+
+  <!--
+    ===== 05 — Implementation (optional) =====
+    Only include if the user requested "agenda + implementation build log".
+    Do NOT hand-write these slides here — duplicate
+    templates/implementation-slide-tabbed.html once per journey and insert
+    the filled-in slides here, after the Outcomes slide.
+  -->
+
+</div>
+
+<nav class="deck-nav">
+  <button class="nav-btn" id="prev-btn" onclick="goTo(current-1)" aria-label="Previous">‹</button>
+  <div class="dots" id="dots"></div>
+  <span class="counter" id="counter">01 / 01</span>
+  <button class="nav-btn" id="next-btn" onclick="goTo(current+1)" aria-label="Next">›</button>
+</nav>
+
+<script>
+  // Shared nav script — do not rewrite per agenda. Buttons + arrow keys only;
+  // no scroll/wheel-to-advance. Long slides scroll internally via CSS overflow.
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var current = 0;
+  var dotsWrap = document.getElementById('dots');
+  var sideMenu = document.getElementById('side-menu');
+  var menuItems = [];
+
+  for (var i = 0; i < total; i++) {
+    var d = document.createElement('button');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+    d.onclick = (function(idx) { return function() { goTo(idx); }; })(i);
+    dotsWrap.appendChild(d);
+
+    var m = document.createElement('button');
+    m.className = 'side-menu-item' + (i === 0 ? ' active' : '');
+    m.textContent = slides[i].dataset.menu || ('Slide ' + (i + 1));
+    // Clicking a menu item navigates; it only auto-closes the menu on
+    // narrow/overlay screens, where the menu covers the slide underneath.
+    m.onclick = (function(idx) { return function() {
+      goTo(idx);
+      if (window.innerWidth < 900) closeMenu();
+    }; })(i);
+    sideMenu.appendChild(m);
+    menuItems.push(m);
+  }
+
+  var menuToggle = document.getElementById('menu-toggle');
+  var menuBackdrop = document.getElementById('menu-backdrop');
+  function openMenu() { sideMenu.classList.add('open'); menuBackdrop.classList.add('open'); document.body.classList.add('menu-open'); }
+  function closeMenu() { sideMenu.classList.remove('open'); menuBackdrop.classList.remove('open'); document.body.classList.remove('menu-open'); }
+  menuToggle.addEventListener('click', function () {
+    sideMenu.classList.contains('open') ? closeMenu() : openMenu();
+  });
+  menuBackdrop.addEventListener('click', closeMenu);
+
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function goTo(i) {
+    if (i < 0 || i >= total) return;
+    slides[current].classList.remove('active');
+    dotsWrap.children[current].classList.remove('active');
+    current = i;
+    var incoming = slides[current];
+    incoming.classList.add('active');
+    incoming.scrollTop = 0;
+    dotsWrap.children[current].classList.add('active');
+    menuItems.forEach(function (m) { m.classList.remove('active'); });
+    menuItems[current].classList.add('active');
+    document.getElementById('counter').textContent = pad(current + 1) + ' / ' + pad(total);
+    document.getElementById('prev-btn').disabled = current === 0;
+    document.getElementById('next-btn').disabled = current === total - 1;
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goTo(current + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+  });
+
+  // Implementation-slide tabs (present only if section 05 was included).
+  // Scoped per .slide-inner so multiple tabbed slides don't collide.
+  document.querySelectorAll('.slide-inner').forEach(function (root) {
+    var btns = root.querySelectorAll('.impl-tab-btn');
+    var panels = root.querySelectorAll('.impl-tab-panel');
+    if (!btns.length) return;
+    btns.forEach(function (btn, idx) {
+      btn.addEventListener('click', function () {
+        btns.forEach(function (b) { b.classList.remove('active'); });
+        panels.forEach(function (p) { p.classList.remove('active'); });
+        btn.classList.add('active');
+        panels[idx].classList.add('active');
+      });
+    });
+  });
+
+  goTo(0);
+</script>
+
+</body>
+</html>

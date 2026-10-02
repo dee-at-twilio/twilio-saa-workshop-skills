@@ -1,0 +1,68 @@
+<!--
+  IMPLEMENTATION SLIDE PARTIAL — one of these per journey, appended to the
+  deck after the Outcomes slide, in journey order (Journey 1, 2, 3…).
+
+  Always tabbed, one tab per implementation step — even a single-step journey
+  gets one tab, for visual consistency across the deck. Tabs let a step carry
+  more content (longer explanation, multiple snippets, a screenshot) without
+  crowding neighboring steps.
+
+  {{JOURNEY_NUM}}      — must match the number used in section 02
+  {{JOURNEY_TITLE}}     — must match the title used in section 02
+  {{PRODUCT_TAGS}}      — must match the tags used in that journey's section-02 entry
+
+  Also set data-menu on the <section> (e.g. "05 Implementation · J1") so this
+  slide shows up correctly in the collapsible left-hand slide menu.
+
+  Repeat the .impl-tab-btn / .impl-tab-panel pair once per step. Keep them in
+  the same order (tab N corresponds to panel N — the nav script pairs them by
+  index, not by id, so don't reorder one without the other).
+
+  Inside a .impl-tab-panel, .code-panel and .screenshot-panel are both
+  optional and repeatable — a step can have neither, one of each, or several
+  of either (e.g. two snippets in one step).
+-->
+<section class="slide" data-menu="05 Implementation · J{{JOURNEY_NUM}}">
+  <div class="slide-inner">
+    <div class="eyebrow">05 — Implementation</div>
+    <h2>Journey {{JOURNEY_NUM}}: {{JOURNEY_TITLE}}</h2>
+    <div class="tag-row impl-tags">{{PRODUCT_TAGS}}</div>
+
+    <div class="impl-tabs">
+      <!-- REPEAT one button per step -->
+      <button class="impl-tab-btn active">{{STEP_NUM}} {{STEP_SHORT_NAME}}</button>
+    </div>
+
+    <!-- REPEAT one panel per step, same order as the buttons above.
+         First panel gets class="impl-tab-panel active", the rest just "impl-tab-panel". -->
+    <div class="impl-tab-panel active">
+      <div class="impl-steps">
+        <div class="impl-step">
+          <div class="step-num">{{STEP_NUM}}</div>
+          <div class="step-title">{{STEP_TITLE}}</div>
+          <div class="step-desc">{{STEP_DESC}}</div>
+
+          <!-- Optional, repeatable: one .code-panel per snippet for this step.
+               Plain mono, no syntax color-coding. Check snippets/{language}/
+               for an existing file before writing a new one; after generating,
+               ask the user whether to save new/reusable ones to the library. -->
+          <div class="code-panel">
+            <div class="code-label">{{FILENAME}}</div>
+            <pre><code>{{CODE_SNIPPET}}</code></pre>
+          </div>
+
+          <!-- Optional, repeatable: one .screenshot-panel per image for this step.
+               ALWAYS base64 data URI — never an external file path.
+               Always include a caption; ask the user for one if not given.
+               Flag once that screenshots may carry visible account-specific
+               identifiers (SIDs, phone numbers, customer names) before embedding. -->
+          <div class="screenshot-panel">
+            <img src="data:image/png;base64,{{BASE64_IMAGE_DATA}}" alt="{{ALT_TEXT}}">
+            <div class="screenshot-caption">{{CAPTION}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
