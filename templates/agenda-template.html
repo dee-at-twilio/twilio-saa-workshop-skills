@@ -133,12 +133,12 @@
   .tag { font-family: var(--font-m); font-size: 11px; color: var(--text-dim); border: 1px solid var(--line); padding: 4px 10px; border-radius: 999px; }
 
   /* Themed link styling — used on prerequisite descriptions, cover subtitle,
-     architecture recap, and any other prose that embeds a link. */
-  .p-desc a, .lede a, .arch-recap a {
+     Twilio-components recap, and any other prose that embeds a link. */
+  .p-desc a, .lede a, .components-recap a {
     color: var(--terracotta); text-decoration: none;
     border-bottom: 1px solid rgba(181,80,46,0.35);
   }
-  .p-desc a:hover, .lede a:hover, .arch-recap a:hover { border-bottom-color: var(--terracotta); }
+  .p-desc a:hover, .lede a:hover, .components-recap a:hover { border-bottom-color: var(--terracotta); }
 
   .day-date { font-family: var(--font-m); font-size: 13px; color: var(--text-faint); margin-top: -22px; margin-bottom: 32px; display: block; }
   .timeline { position: relative; padding-left: 100px; }
@@ -164,7 +164,25 @@
   .outcome .o-label { font-family: var(--font-m); font-size: 11.5px; color: var(--terracotta); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.03em; }
   .outcome p { font-family: var(--font-h); font-size: 18px; color: var(--text); max-width: 620px; }
 
-  /* ---------- Implementation (section 05 or 06 if Architecture present) ---------- */
+  /* ---------- Twilio components slide (optional — only when the partial is inserted) ---------- */
+  /* Used by templates/twilio-components-slide.html. The SVG inside is fully self-contained
+     (its own <defs> markers and inline <style>) — these rules style only the panel
+     wrapper, label, and the plain-prose recap list underneath. */
+  .components-panel {
+    background: var(--bg-alt); border: 1px dotted var(--line); border-radius: 6px;
+    margin: 4px 0 24px; overflow: hidden;
+  }
+  .components-panel svg { display: block; width: 100%; height: auto; }
+  .components-label {
+    font-family: var(--font-m); font-size: 10.5px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-faint); margin-bottom: 12px;
+  }
+  .components-recap { color: var(--text-dim); font-size: 14.5px; max-width: 780px; }
+  .components-recap ol { padding-left: 22px; }
+  .components-recap ol li { margin-bottom: 6px; padding-left: 4px; }
+  .components-recap ol li strong { color: var(--text); font-weight: 600; }
+
+  /* ---------- Implementation (section 05 or 06 if Twilio components slide present) ---------- */
   /* Shared with implementation-slide-tabbed.html (Overview + Steps per journey). */
   .impl-tags { margin: -14px 0 30px; }
 
@@ -299,13 +317,14 @@
 
   <!--
     Eyebrow numbering: 01 Prerequisites, 02 Journeys, 03 Agenda, 04 Outcomes,
-    05 Implementation. If an Architecture slide is included, it takes 02 and
-    every subsequent eyebrow shifts up by one (Journeys 03, Agenda 04,
+    05 Implementation. If a Twilio components slide is included, it takes 02
+    and every subsequent eyebrow shifts up by one (Journeys 03, Agenda 04,
     Outcomes 05, Implementation 06).
 
     data-menu is a short label scoped to its data-menu-group (the group
     heading already carries the section name — do not repeat the number in
-    the label text). Groups: Overview, Journeys, Agenda, Outcomes, Implementation.
+    the label text). Groups: Overview, Twilio components, Journeys, Agenda,
+    Outcomes, Implementation.
   -->
 
   <!-- ===== Cover ===== -->
@@ -341,7 +360,20 @@
   </section>
 
   <!--
-    ===== 02 (or 03 if Architecture present) — Use cases & journeys =====
+    ===== 02 — Twilio components (optional) =====
+    Only include on explicit user request. Insert templates/twilio-components-slide.html
+    here. When present, Twilio components takes eyebrow 02 and every subsequent
+    slide (Journeys, Agenda, Outcomes, Implementation) shifts up by one. Read
+    references/twilio-components-slide.md BEFORE editing the SVG — the
+    hand-rolled diagram has a mandatory numeric verification gate.
+
+    Name is deliberate: this diagram shows the Twilio products the workshop
+    wires together, NOT the customer's own system architecture. Customer-side
+    architecture diagrams (if any) get built during the workshop.
+  -->
+
+  <!--
+    ===== 02 (or 03 if Twilio components present) — Use cases & journeys =====
     ONE SLIDE PER JOURNEY. Do not stack multiple journeys into a single slide,
     even when they would fit. Each journey (including bonus journeys) is its
     own <section class="slide">, sharing the eyebrow but with its own h2,
@@ -415,7 +447,7 @@
   </section>
 
   <!--
-    ===== 05 (or 06 if Architecture present) — Implementation (optional) =====
+    ===== 05 (or 06 if Twilio components present) — Implementation (optional) =====
     Only include if the user requested "agenda + implementation build log".
     Do NOT hand-write these slides here — duplicate the two partials in
     templates/implementation-slide-tabbed.html (Overview + Steps) once per

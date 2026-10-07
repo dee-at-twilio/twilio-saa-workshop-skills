@@ -1,0 +1,160 @@
+<!--
+  TWILIO COMPONENTS SLIDE PARTIAL — optional, drop between Prerequisites and
+  Journeys ONLY on explicit user request.
+
+  Named "Twilio components" (not "Architecture") deliberately: the diagram
+  shows which Twilio products you'll be wiring together, NOT the customer's
+  own system architecture. Customer-side architecture diagrams (if any) are
+  built during the workshop itself — distinct deliverable, distinct slide.
+
+  When present, it takes eyebrow 02 and shifts every subsequent slide:
+    Prereq 01, Twilio components 02, Journeys 03, Agenda 04, Outcomes 05,
+    Implementation 06 (both Overview and Steps).
+
+  The SVG below is the canonical Paper-style components diagram:
+  Twilio-product boxes only (Conversation Orchestrator at the front,
+  Conversation Memory + Conversation Intelligence downstream), ConversationRelay
+  as an annotation on the Voice channel, flat editorial boxes, no colored
+  header bars, no icon shelves. Read references/twilio-components-slide.md
+  BEFORE editing the SVG — it carries the mandatory numeric verification gate
+  for label widths, arrow origins, and chip positioning.
+
+  Placeholders:
+    {{EYEBROW_NUM}}   — "02" (Twilio components is always 02 when present).
+    {{H2}}            — Slide title. Default: "Twilio components" or
+                        "The Twilio products you'll wire together"; keep
+                        Twilio-product focused, don't drift into customer design.
+    {{CHANNEL_CHIPS}} — The channel chips row INSIDE the Conversation
+                        Orchestrator box. Default is SMS + Voice + WhatsApp;
+                        drop channels the customer isn't using. Chip x/width
+                        coordinates in the SVG below assume three chips at
+                        x=60 / x=192 / x=324 — if dropping to two, re-center
+                        and re-run the numeric gate in twilio-components-slide.md.
+    {{CR_ANNOTATION}} — "Voice: ConversationRelay (STT/TTS + LLM turn loop)"
+                        unless Voice is out of scope.
+    {{SMS_ANNOTATION}}— "SMS: Programmable Messaging / Conversations" unless
+                        SMS is out of scope.
+
+  The .components-recap <ol> below is the plain-prose readout under the diagram.
+  Keep each <li> to one sentence, naming the Twilio product in <strong> and
+  the endpoint URL (where applicable) in inline <code>. Do NOT invent fifth
+  or sixth bullets for customer-side components — the recap mirrors the four
+  Twilio-product boxes plus a TAC footnote.
+-->
+<section class="slide"
+         data-menu="Twilio components"
+         data-menu-group="Twilio components">
+  <div class="slide-inner">
+    <div class="eyebrow">{{EYEBROW_NUM}} — Twilio components</div>
+    <h2>{{H2}}</h2>
+
+    <div class="components-panel" style="padding: 18px 20px 22px;">
+      <div class="components-label">Conversation Orchestrator · Memory · Intelligence — Twilio products</div>
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 420" role="img"
+           aria-label="Twilio components for conversational agents">
+        <defs>
+          <marker id="arr-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#B5502E"/>
+          </marker>
+          <marker id="arr-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#4E7089"/>
+          </marker>
+          <marker id="arr-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#7A6A9E"/>
+          </marker>
+        </defs>
+        <style>
+          .a-h  { font-family: 'Fraunces', serif; font-size: 16px; fill: #2B241E; font-weight: 600; }
+          .a-b  { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; fill: #2B241E; }
+          .a-m  { font-family: 'IBM Plex Mono', monospace; font-size: 11px; fill: #6C5F51; }
+          .a-s  { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: #A89A87; font-style: italic; }
+          .a-tt { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: #B5502E; }
+          .a-tb { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: #4E7089; }
+          .a-tv { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: #7A6A9E; }
+          .box       { fill: #FDFAF3; stroke: rgba(43,36,30,0.28); stroke-width: 1; }
+          .box-orch  { fill: rgba(181,80,46,0.06);  stroke: #B5502E; stroke-width: 1.4; }
+          .box-mem   { fill: rgba(78,112,137,0.06); stroke: #4E7089; stroke-width: 1.4; }
+          .box-intel { fill: rgba(122,106,158,0.08); stroke: #7A6A9E; stroke-width: 1.4; }
+          .flow-t { stroke: #B5502E; stroke-width: 1.6; fill: none; }
+          .flow-b { stroke: #4E7089; stroke-width: 1.6; fill: none; }
+          .flow-v { stroke: #7A6A9E; stroke-width: 1.6; fill: none; }
+        </style>
+
+        <!-- User (top-left) -->
+        <text class="a-h" x="60" y="52">User</text>
+
+        <!-- User → Twilio number -->
+        <line class="flow-t" x1="150" y1="60" x2="199" y2="60" marker-end="url(#arr-t)"/>
+        <text class="a-tt" x="174" y="52" text-anchor="middle">inbound</text>
+
+        <!-- Twilio number box -->
+        <rect class="box" x="205" y="30" width="160" height="66" rx="4"/>
+        <text class="a-h" x="285" y="58" text-anchor="middle">Twilio number</text>
+        <text class="a-m" x="285" y="78" text-anchor="middle">entry point</text>
+
+        <!-- Twilio number → Conversation Orchestrator (down into the box top) -->
+        <line class="flow-t" x1="285" y1="98" x2="285" y2="164" marker-end="url(#arr-t)"/>
+        <text class="a-tt" x="292" y="135" text-anchor="start">observed traffic</text>
+
+        <!-- Conversation Orchestrator — the star; occupies the left half -->
+        <rect class="box-orch" x="40" y="170" width="460" height="220" rx="6"/>
+        <text class="a-h"  x="60" y="200">Conversation Orchestrator</text>
+        <text class="a-tt" x="60" y="219">Twilio product · captures + links across channels</text>
+
+        <text class="a-b" x="60" y="250">Channels observed:</text>
+        <!--
+          {{CHANNEL_CHIPS}} — three-chip default (SMS / Voice / WhatsApp).
+          Drop a chip the customer isn't using and re-run the numeric gate.
+        -->
+        <rect class="box" x="60"  y="260" width="120" height="28" rx="3"/>
+        <text class="a-b" x="120" y="279" text-anchor="middle">SMS</text>
+        <rect class="box" x="192" y="260" width="120" height="28" rx="3"/>
+        <text class="a-b" x="252" y="279" text-anchor="middle">Voice</text>
+        <rect class="box" x="324" y="260" width="156" height="28" rx="3"/>
+        <text class="a-b" x="402" y="279" text-anchor="middle">WhatsApp</text>
+
+        <text class="a-tt" x="60" y="316">{{CR_ANNOTATION}}</text>
+        <text class="a-tt" x="60" y="334">{{SMS_ANNOTATION}}</text>
+
+        <text class="a-s"  x="60" y="366">Your integration app consumes these Twilio products.</text>
+        <text class="a-s"  x="60" y="382">TAC (Agent Connect) is a Python SDK that helps build it.</text>
+
+        <!-- Conversation Memory (right, top) -->
+        <rect class="box-mem" x="590" y="170" width="610" height="100" rx="6"/>
+        <text class="a-h"  x="610" y="200">Conversation Memory</text>
+        <text class="a-tb" x="610" y="219">Twilio product · profile + history across sessions</text>
+        <text class="a-m"  x="610" y="244">memory.twilio.com/v1</text>
+        <text class="a-s"  x="610" y="260">read at turn start · written at turn end</text>
+
+        <!-- Conversation Intelligence (right, bottom) -->
+        <rect class="box-intel" x="590" y="300" width="610" height="100" rx="6"/>
+        <text class="a-h"  x="610" y="330">Conversation Intelligence</text>
+        <text class="a-tv" x="610" y="349">Twilio product · operators over the transcript</text>
+        <text class="a-m"  x="610" y="374">intelligence.twilio.com/v3</text>
+        <text class="a-s"  x="610" y="390">intents · summaries · sentiment · redactions</text>
+
+        <!-- Conversation Orchestrator ↔ Memory (in the 90px gap x=500..590) -->
+        <line class="flow-b" x1="500" y1="200" x2="584" y2="200" marker-end="url(#arr-b)"/>
+        <line class="flow-b" x1="590" y1="238" x2="506" y2="238" marker-end="url(#arr-b)"/>
+        <text class="a-tb" x="545" y="194" text-anchor="middle">hydrate</text>
+        <text class="a-tb" x="545" y="254" text-anchor="middle">context</text>
+
+        <!-- Conversation Orchestrator ↔ Intelligence (in the 90px gap) -->
+        <line class="flow-v" x1="500" y1="332" x2="584" y2="332" marker-end="url(#arr-v)"/>
+        <line class="flow-v" x1="590" y1="368" x2="506" y2="368" marker-end="url(#arr-v)"/>
+        <text class="a-tv" x="545" y="326" text-anchor="middle">analyse</text>
+        <text class="a-tv" x="545" y="384" text-anchor="middle">result</text>
+      </svg>
+    </div>
+
+    <div class="components-recap">
+      <ol>
+        <li><strong>Conversation Orchestrator</strong> is the Twilio product that observes traffic from your Twilio account, links it to customer profiles, and makes it available for AI agents and analytics. Docs: <a href="https://www.twilio.com/docs/conversations/orchestrator" target="_blank" rel="noopener"><code>twilio.com/docs/conversations/orchestrator</code></a>.</li>
+        <li><strong>Conversation Memory</strong> persists profile and conversation history across sessions. Twilio product at <code>memory.twilio.com/v1</code>.</li>
+        <li><strong>Conversation Intelligence</strong> runs operators over the transcript to produce intents, summaries, and sentiment. Twilio product at <code>intelligence.twilio.com/v3</code>.</li>
+        <li><strong>ConversationRelay</strong> is the Twilio product that powers the Voice channel end-to-end (STT/TTS + LLM turn loop).</li>
+        <li><strong>TAC</strong> (Twilio Agent Connect) is a Python SDK for integrating with the four Twilio products above.</li>
+      </ol>
+    </div>
+  </div>
+</section>

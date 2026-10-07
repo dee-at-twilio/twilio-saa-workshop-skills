@@ -1,6 +1,14 @@
-# Architecture slide reference
+# Twilio components slide reference
 
-Read this before drafting an Architecture slide. The slide is optional — only add it when the user explicitly asks for a system-architecture diagram alongside the workshop. When present, it sits between Prerequisites and Use cases & journeys, taking eyebrow number 02 (and shifting the rest by one: Prereq = 01, Architecture = 02, Journeys = 03, Agenda = 04, Outcomes = 05, Implementation = 06).
+Read this before drafting a Twilio components slide. The slide is optional — only add it when the user explicitly asks for a system diagram alongside the workshop. When present, it sits between Prerequisites and Use cases & journeys, taking eyebrow number 02 (and shifting the rest by one: Prereq = 01, Twilio components = 02, Journeys = 03, Agenda = 04, Outcomes = 05, Implementation = 06).
+
+**Named "Twilio components", not "Architecture", deliberately.** The diagram shows which Twilio products the workshop will wire together — Conversation Orchestrator, Memory, Intelligence, ConversationRelay. It is NOT the customer's own system architecture. Customer-side architecture diagrams (if any) are a distinct deliverable, often built *during* the workshop, and belong on their own slide (or in their own doc).
+
+## Start from the partial
+
+A canonical, working Paper-style Twilio components slide lives at **`templates/twilio-components-slide.html`** — the same SVG that shipped in the Intuit workshop (`/Users/dnaidu/workshops/intuit/workshop/index.html`), with customer-specific wording replaced by `{{PLACEHOLDER}}` tokens. **Copy it into the deck first**, then adapt — do not hand-roll a fresh SVG. The partial has already passed the numeric verification gate below for its default three-chip (SMS / Voice / WhatsApp) layout; if you add or drop a chip, re-run the gate for the chip row only.
+
+The surrounding `.components-panel` / `.components-label` / `.components-recap` CSS is already in `templates/agenda-template.html`; no extra styles needed when inserting the partial.
 
 ## What the diagram teaches
 
@@ -58,7 +66,7 @@ Concrete layout at `viewBox="0 0 1240 420"`:
 
 ## Diagram cleanliness — numeric verification gate
 
-**Scope.** These rules apply to the hand-rolled SVG architecture diagram only. Sequence diagrams are Mermaid and this section does not apply to them.
+**Scope.** These rules apply to the hand-rolled SVG Twilio-components diagram only. Sequence diagrams are Mermaid and this section does not apply to them.
 
 **Text on top of a shape is always a bug — even a short label, even for one draft.** Before you consider the diagram "done", walk every `<text>` element against every `<rect>` and every `<line>`: label bboxes must sit inside their intended container with ≥8px inset, or in the gap between boxes with ≥6px clear space on both sides, or outside the SVG entirely. "Mentally walking it" does not work — soft checks have lost to real bugs repeatedly (Intuit chat-identifier deck Sep 2026; Twilio Connect Blueprint arch diagram Oct 2026). Replace mental checks with the numeric gate below.
 
@@ -141,17 +149,8 @@ Prefer 4–8 character labels for arrow annotations: `inbound`, `read`/`write`, 
 
 ## CSS for the surrounding panel
 
-The panel wrapper reuses the `.diagram-panel` / `.diagram-label` / `.diagram-caption` triple from `jobID_presentation`. Add to the deck's inline `<style>` if not already there:
+Already in `templates/agenda-template.html` — the `.components-panel`, `.components-label`, and `.components-recap` rules ship with the base deck. Nothing to add if you insert `templates/twilio-components-slide.html` into a deck started from the base template.
 
-```css
-.diagram-panel { background: var(--bg-alt); border: 1px dotted var(--line); border-radius: 6px; padding: 18px 20px 22px; margin-bottom: 18px; }
-.diagram-label { font-family: var(--font-m); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 12px; }
-.diagram-panel svg { display: block; width: 100%; height: auto; }
-.diagram-caption { color: var(--text-dim); font-size: 13.5px; font-family: var(--font-h); font-style: italic; max-width: 760px; margin-top: 4px; }
-.arch-recap { color: var(--text-dim); font-size: 14.5px; max-width: 780px; }
-.arch-recap ol { padding-left: 22px; }
-.arch-recap ol li { margin-bottom: 6px; padding-left: 4px; }
-.arch-recap ol li strong { color: var(--text); font-weight: 600; }
-```
+For Mermaid sequence diagrams, the `.diagram-panel` / `.diagram-label` / `.diagram-caption` triple is a separate concern — see SKILL.md §Sequence diagrams.
 
 The SVG is fully self-contained (its own `<defs>` markers + inline `<style>` for `.a-*` / `.box*` / `.flow-*`). Nothing outside the SVG needs to know its internal classes.
