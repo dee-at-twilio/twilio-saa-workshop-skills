@@ -6,7 +6,7 @@ Read this before drafting a Twilio components slide. The slide is optional — o
 
 ## Start from the partial
 
-A canonical, working Paper-style Twilio components slide lives at **`templates/twilio-components-slide.html`** — the same SVG that shipped in the Intuit workshop (`/Users/dnaidu/workshops/intuit/workshop/index.html`), with customer-specific wording replaced by `{{PLACEHOLDER}}` tokens. **Copy it into the deck first**, then adapt — do not hand-roll a fresh SVG. The partial has already passed the numeric verification gate below for its default three-chip (SMS / Voice / WhatsApp) layout; if you add or drop a chip, re-run the gate for the chip row only.
+A canonical, working Paper-style Twilio components slide lives at **`templates/twilio-components-slide.html`**, with customer-specific wording replaced by `{{PLACEHOLDER}}` tokens. **Copy it into the deck first**, then adapt — do not hand-roll a fresh SVG. The partial has already passed the numeric verification gate below for its default three-chip (SMS / Voice / WhatsApp) layout; if you add or drop a chip, re-run the gate for the chip row only.
 
 The surrounding `.components-panel` / `.components-label` / `.components-recap` CSS is already in `templates/agenda-template.html`; no extra styles needed when inserting the partial.
 
@@ -20,7 +20,7 @@ The surrounding `.components-panel` / `.components-label` / `.components-recap` 
 
 ## Visual style — flat editorial, not colored header bars
 
-**Neat, flat, Paper-editorial.** The pattern comes from `workshops/intuit/chat-identifier-demo-app/jobID_presentation/index.html` — a single wide SVG built from cream boxes with soft palette-tinted borders, one inline `<style>` block defining typography and box classes, minimal arrows, and no colored header bars, no per-box icon clusters, no channel-icon shelves inside boxes. If the diagram starts looking like an infographic — bright banded box tops, cartoon icons for LLM/NLU/Logic, gradient tiles — it's wrong. Rewrite it flat.
+**Neat, flat, Paper-editorial.** A single wide SVG built from cream boxes with soft palette-tinted borders, one inline `<style>` block defining typography and box classes, minimal arrows, and no colored header bars, no per-box icon clusters, no channel-icon shelves inside boxes. If the diagram starts looking like an infographic — bright banded box tops, cartoon icons for LLM/NLU/Logic, gradient tiles — it's wrong. Rewrite it flat.
 
 **Do NOT copy the "Conversational AI System Architecture" reference image aesthetic** (dark navy header bars, channel icons packed inside a "CONVERSATION RELAY" tile, floating "AI/LLM/NLU/Logic" icons inside "INTELLIGENCE"). That image is a marketing-style infographic — it doesn't fit the Paper theme and it also carries a Twilio-semantic error (ConversationRelay does not manage all channels; cross-channel capture is done by Conversation Orchestrator).
 

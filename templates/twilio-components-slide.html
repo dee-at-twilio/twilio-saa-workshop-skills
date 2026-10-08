@@ -53,31 +53,37 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 420" role="img"
            aria-label="Twilio components for conversational agents">
         <defs>
-          <marker id="arr-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#B5502E"/>
+          <marker id="arr-t" class="mk-t" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z"/>
           </marker>
-          <marker id="arr-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#4E7089"/>
+          <marker id="arr-b" class="mk-b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z"/>
           </marker>
-          <marker id="arr-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#7A6A9E"/>
+          <marker id="arr-v" class="mk-v" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z"/>
           </marker>
         </defs>
         <style>
-          .a-h  { font-family: 'Fraunces', serif; font-size: 16px; fill: #2B241E; font-weight: 600; }
-          .a-b  { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; fill: #2B241E; }
-          .a-m  { font-family: 'IBM Plex Mono', monospace; font-size: 11px; fill: #6C5F51; }
-          .a-s  { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: #A89A87; font-style: italic; }
-          .a-tt { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: #B5502E; }
-          .a-tb { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: #4E7089; }
-          .a-tv { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: #7A6A9E; }
-          .box       { fill: #FDFAF3; stroke: rgba(43,36,30,0.28); stroke-width: 1; }
-          .box-orch  { fill: rgba(181,80,46,0.06);  stroke: #B5502E; stroke-width: 1.4; }
-          .box-mem   { fill: rgba(78,112,137,0.06); stroke: #4E7089; stroke-width: 1.4; }
-          .box-intel { fill: rgba(122,106,158,0.08); stroke: #7A6A9E; stroke-width: 1.4; }
-          .flow-t { stroke: #B5502E; stroke-width: 1.6; fill: none; }
-          .flow-b { stroke: #4E7089; stroke-width: 1.6; fill: none; }
-          .flow-v { stroke: #7A6A9E; stroke-width: 1.6; fill: none; }
+          /* Theme-aware: fills/strokes resolve against the deck's CSS variables
+             so Ink (dark) and Paper (light) both work. Keep var references —
+             do NOT inline hex here. */
+          .a-h  { font-family: 'Fraunces', serif; font-size: 16px; fill: var(--text); font-weight: 600; }
+          .a-b  { font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; fill: var(--text); }
+          .a-m  { font-family: 'IBM Plex Mono', monospace; font-size: 11px; fill: var(--text-dim); }
+          .a-s  { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: var(--text-faint); font-style: italic; }
+          .a-tt { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: var(--terracotta); }
+          .a-tb { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: var(--dusty-blue); }
+          .a-tv { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; fill: var(--violet); }
+          .box       { fill: var(--bg-alt); stroke: var(--line); stroke-width: 1; }
+          .box-orch  { fill: var(--terracotta-soft); stroke: var(--terracotta); stroke-width: 1.4; }
+          .box-mem   { fill: var(--dusty-blue-soft); stroke: var(--dusty-blue); stroke-width: 1.4; }
+          .box-intel { fill: var(--violet-soft);     stroke: var(--violet);     stroke-width: 1.4; }
+          .flow-t { stroke: var(--terracotta); stroke-width: 1.6; fill: none; }
+          .flow-b { stroke: var(--dusty-blue); stroke-width: 1.6; fill: none; }
+          .flow-v { stroke: var(--violet);     stroke-width: 1.6; fill: none; }
+          #arr-t path { fill: var(--terracotta); }
+          #arr-b path { fill: var(--dusty-blue); }
+          #arr-v path { fill: var(--violet); }
         </style>
 
         <!-- User (top-left) -->

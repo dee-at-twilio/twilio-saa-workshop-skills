@@ -1,6 +1,7 @@
 # Python snippets
 
-Self-contained Python snippets stripped from the sierra-test API reference repo.
+Self-contained Python snippets stripped from the vendored Twilio API Explorer
+(see `../../references/twilio-api-reference/`).
 **Before writing a new snippet for an implementation step, scan this index.**
 If a match exists, copy the file into the code panel verbatim (or with the
 minimal diff needed for the customer's situation). Only write a new snippet

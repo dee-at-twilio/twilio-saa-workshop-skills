@@ -1,11 +1,14 @@
-# Sierra reference — frozen copy of the SAA Twilio API Explorer
+# Twilio API reference — vendored call-shape snapshots
 
 These files are vendored copies of `pages/*.py` from the SAA team's internal
-Streamlit "Twilio API Explorer" (sierra-test). They are the canonical reference
-for current Twilio API shapes used across workshops.
+Streamlit "Twilio API Explorer" (upstream repo: `sierra-test`). They are the
+canonical reference for current Twilio API call shapes used across workshops.
 
-**Vendored, not live.** Update this directory when sierra-test gains new pages
-or when a Twilio API shape it demonstrates changes.
+**Vendored, not live.** Refresh this directory when the upstream repo gains
+new pages or when a Twilio API shape it demonstrates changes. If you don't
+have access to `sierra-test`, verify shapes against `mcp__twilio-docs__twilio__retrieve`
+and the product skills instead — this directory is a shortcut, not a hard
+dependency.
 
 ## When to read which file
 

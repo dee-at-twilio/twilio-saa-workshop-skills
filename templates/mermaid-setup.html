@@ -10,11 +10,9 @@
   coordinate math to get wrong, no character-width estimation, and no way for
   labels to overflow their containers or arrows to float in the wrong place.
 
-  This is the pattern proven in
-    /Users/dnaidu/workshops/intuit/chat-identifier-demo-app/jobID_presentation/index.html
-  which uses Mermaid with a Paper-palette theme override that matches the
-  workshop deck's yellow-pill / dashed-orange-lifeline / gray-activation
-  aesthetic exactly.
+  The themeVariables block below carries a Paper-palette override matching
+  the workshop deck's yellow-pill / dashed-orange-lifeline / gray-activation
+  aesthetic.
 
   How to install in a deck
   ------------------------
@@ -47,47 +45,106 @@
   ==============================================================================
 -->
 
-<!-- Mermaid: declarative sequence diagrams themed to the Paper palette -->
+<!-- Mermaid: declarative sequence diagrams themed to the deck's Paper/Ink palette.
+     Palette is derived from the deck's CSS variables and re-rendered when
+     `html[data-theme]` flips, so Ink and Paper both work without per-diagram
+     overrides. -->
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
-  mermaid.initialize({
-    startOnLoad: true,
-    securityLevel: 'loose',
-    theme: 'base',
-    themeVariables: {
-      fontFamily: '"IBM Plex Sans", system-ui, sans-serif',
-      fontSize: '14px',
-      primaryColor:        '#FDD35C',
-      primaryBorderColor:  '#E8A62A',
-      primaryTextColor:    '#D9482E',
-      lineColor:           '#E88030',
-      signalColor:         '#E88030',
-      signalTextColor:     '#2B241E',
-      noteBkgColor:        '#FFF6DC',
-      noteBorderColor:     '#E8A62A',
-      noteTextColor:       '#4E4033',
-      actorBkg:            '#FDD35C',
-      actorBorder:         '#E8A62A',
-      actorTextColor:      '#D9482E',
-      actorLineColor:      '#E88030',
-      activationBkgColor:  '#F0EFEA',
-      activationBorderColor:'#B8B0A0',
-      labelBoxBkgColor:    '#EEF3F9',
-      labelBoxBorderColor: '#6BA4E7',
-      labelTextColor:      '#4A6B85',
-      sequenceNumberColor: '#2B241E',
-      altBackground:       'rgba(107,164,231,0.06)'
-    },
-    sequence: {
-      diagramMarginX: 24,
-      diagramMarginY: 12,
-      boxMargin: 20,
-      noteMargin: 12,
-      messageMargin: 50,
-      mirrorActors: false,
-      wrap: true
+
+  const PAPER = {
+    primaryColor:        '#FDD35C',
+    primaryBorderColor:  '#E8A62A',
+    primaryTextColor:    '#D9482E',
+    lineColor:           '#E88030',
+    signalColor:         '#E88030',
+    signalTextColor:     '#2B241E',
+    noteBkgColor:        '#FFF6DC',
+    noteBorderColor:     '#E8A62A',
+    noteTextColor:       '#4E4033',
+    actorBkg:            '#FDD35C',
+    actorBorder:         '#E8A62A',
+    actorTextColor:      '#D9482E',
+    actorLineColor:      '#E88030',
+    activationBkgColor:  '#F0EFEA',
+    activationBorderColor:'#B8B0A0',
+    labelBoxBkgColor:    '#EEF3F9',
+    labelBoxBorderColor: '#6BA4E7',
+    labelTextColor:      '#4A6B85',
+    sequenceNumberColor: '#2B241E',
+    altBackground:       'rgba(107,164,231,0.06)',
+  };
+
+  // Ink counterpart — warmer dark substrate, accents brightened so they still
+  // read warm on dark. Matches the deck's Ink CSS variable palette.
+  const INK = {
+    primaryColor:        '#3B2E1E',
+    primaryBorderColor:  '#D9A647',
+    primaryTextColor:    '#E07B57',
+    lineColor:           '#E07B57',
+    signalColor:         '#E07B57',
+    signalTextColor:     '#F0E8D8',
+    noteBkgColor:        '#2A2217',
+    noteBorderColor:     '#D9A647',
+    noteTextColor:       '#F0E8D8',
+    actorBkg:            '#3B2E1E',
+    actorBorder:         '#D9A647',
+    actorTextColor:      '#E07B57',
+    actorLineColor:      '#E07B57',
+    activationBkgColor:  '#2A2217',
+    activationBorderColor:'#7A6F5E',
+    labelBoxBkgColor:    '#1F2B35',
+    labelBoxBorderColor: '#8CB3CF',
+    labelTextColor:      '#8CB3CF',
+    sequenceNumberColor: '#F0E8D8',
+    altBackground:       'rgba(140,179,207,0.08)',
+  };
+
+  const sources = new WeakMap();
+
+  function init() {
+    const dark = document.documentElement.dataset.theme === 'dark';
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: 'base',
+      themeVariables: {
+        fontFamily: '"IBM Plex Sans", system-ui, sans-serif',
+        fontSize: '14px',
+        ...(dark ? INK : PAPER),
+      },
+      sequence: {
+        diagramMarginX: 24,
+        diagramMarginY: 12,
+        boxMargin: 20,
+        noteMargin: 12,
+        messageMargin: 50,
+        mirrorActors: false,
+        wrap: true,
+      },
+    });
+  }
+
+  async function render() {
+    const blocks = document.querySelectorAll('pre.mermaid');
+    for (const [i, el] of blocks.entries()) {
+      if (!sources.has(el)) sources.set(el, el.textContent);
+      const source = sources.get(el);
+      try {
+        const { svg } = await mermaid.render(`mmd-${i}-${Date.now()}`, source);
+        el.innerHTML = svg;
+      } catch (err) {
+        console.error('Mermaid render failed', err);
+      }
     }
-  });
+  }
+
+  init();
+  render();
+
+  // Re-render on theme flip so Mermaid matches Ink/Paper.
+  new MutationObserver(() => { init(); render(); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 </script>
 
 

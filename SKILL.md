@@ -1,6 +1,6 @@
 ---
 name: twilio-saa-workshop
-description: Use ONLY when the user explicitly asks to generate, build, or create a customer technical workshop/hackathon agenda as an HTML file, in the "Paper" warm/editorial branded format (light default, with an "Ink" dark variant). Trigger phrases include "build a workshop agenda", "create the workshop HTML", "generate a [1/2/3]-day workshop brief", "workshop/hackathon agenda for [customer]". Do NOT use for generic presentations, non-workshop customer documents, PDF/PPTX output, or requests that don't specify HTML workshop agenda output.
+description: Use ONLY when the user explicitly asks to generate, build, or create a customer technical workshop/hackathon agenda as an HTML file, with warm/editorial branding in a paired light ("Paper") and dark ("Ink") theme. Trigger phrases include "build a workshop agenda", "create the workshop HTML", "generate a [1/2/3]-day workshop brief", "workshop/hackathon agenda for [customer]". Do NOT use for generic presentations, non-workshop customer documents, PDF/PPTX output, or requests that don't specify HTML workshop agenda output.
 ---
 
 # Twilio Workshop Agenda Generator
@@ -13,7 +13,7 @@ A warm dark counterpart, **"Ink"**, ships alongside Paper. Same typography, same
 
 **Picking a theme at generation time.** If the user asks for "light" / "paper" / "the usual theme", leave `<body class="menu-open">` and `<html>` as-is (Paper is default). If they ask for "dark" / "ink" / "dark mode", render the deck with `<html data-theme="dark">` so it opens on Ink. Either way the toggle is present and the viewer can switch.
 
-**Known Ink gap — Twilio components SVG and Mermaid diagrams.** The hand-rolled SVG in `templates/twilio-components-slide.html` and the `themeVariables` block in `templates/mermaid-setup.html` bake Paper hex values into inline styles / init options; they do not pick up the `[data-theme="dark"]` CSS variables. When Ink is active those two pieces still render in Paper palette. If a deck is being generated in Ink and includes either slide, call this out to the user before saving.
+Both the hand-rolled Twilio-components SVG (`templates/twilio-components-slide.html`) and the Mermaid initializer (`templates/mermaid-setup.html`) resolve their palette from the deck's CSS variables and re-render on theme flip, so Ink and Paper both work without per-diagram overrides. Do not re-introduce hex literals into either template.
 
 Navigation is buttons and arrow keys only (no wheel/scroll-to-advance). Long slides scroll internally via plain `overflow-y: auto`. Theme, print behavior, and navigation JS all live in `templates/agenda-template.html` — don't override.
 
@@ -31,7 +31,7 @@ Before drafting any journey, Twilio components slide, or implementation step, co
 - What a Twilio URL parameter does, when it fires, what payload it receives, what it returns (`action_url`, `statusCallback`, every webhook/callback/connect-verb/studio-widget).
 - API shapes, parameter names, event names, endpoint paths.
 
-Product-identity details (TAC, Orchestrator, ConversationRelay, Memory, CI, customer-domain tool bodies) live in **`references/twilio-products.md`** — read it before drafting any journey or implementation step touching those products. For current Twilio API call shapes, open the matching page in **`references/sierra-reference/`** and copy imports, env vars, and call shape verbatim (strip Streamlit UI wrapping).
+Product-identity details (TAC, Orchestrator, ConversationRelay, Memory, CI, customer-domain tool bodies) live in **`references/twilio-products.md`** — read it before drafting any journey or implementation step touching those products. For current Twilio API call shapes, open the matching page in **`references/twilio-api-reference/`** and copy imports, env vars, and call shape verbatim (strip Streamlit UI wrapping).
 
 **This rule applies to every downstream step** — journey drafting, Twilio components slides, Mermaid sequence diagrams, snippet writing. Where other sections say "cross-check against product skills," they mean this rule.
 
@@ -57,7 +57,7 @@ Follow these steps in order.
 1. **Confirm trigger fit.** The frontmatter description lists trigger phrases ("workshop agenda", "workshop HTML", "workshop/hackathon agenda for X"). If the request says "presentation", "PDF", or "PPTX", confirm the user actually wants the HTML workshop deliverable before starting.
 2. **Gather inputs** per §3 below. Walk the input list top-to-bottom; ask only for what's missing or can't be inferred.
 3. **Run the compliance check** (see §3) if the use case is HIPAA- or PCI-regulated. Do this before scoping journeys — eligibility affects which products you can tag.
-4. **Verify every Twilio product tagged in any journey** per Rule 1 — product skills + docs MCP + `references/twilio-products.md` + `references/sierra-reference/`.
+4. **Verify every Twilio product tagged in any journey** per Rule 1 — product skills + docs MCP + `references/twilio-products.md` + `references/twilio-api-reference/`.
 5. **For every snippet you plan to use, check `snippets/{language}/README.md` first.** If a match exists, copy that file into the code panel verbatim (or with the minimal customer-specific diff). Only write a new snippet when nothing in the index matches. (Pre-flight the whole deck's snippet needs now so you only read each file once.)
 6. **Copy `templates/agenda-template.html`** and fill in placeholders slide-by-slide, following §4 structure.
 7. **If a build log was requested**, duplicate `templates/implementation-slide-tabbed.html` (two slides per journey — Overview + Steps) once per journey and insert after Outcomes, in the same order as the journey slides. Bonus journeys last. Follow `references/implementation-slides.md`.
@@ -81,7 +81,7 @@ For every item: if the user names it, use it; if a short placeholder can be auto
 7. **Agenda only, or agenda + implementation build log?** **[required]** If build log: for each journey, ask what was actually built — steps, snippets, screenshots worth preserving. Never invent plausible "what we built" content.
 8. **Engagement framing** — **[ask only if ambiguous]** kicks off or continues a longer engagement? Any prior work to recap?
 9. **Meals / social event** — **[ask only if applicable]** only include if confirmed.
-10. **Theme — Paper (light) or Ink (dark)** — **[default: Paper]** only honour an explicit request. Set `<html data-theme="dark">` on render if Ink was asked for; the toolbar toggle lets the viewer flip either way. Do not ask by default.
+10. **Theme — Paper or Ink** — **[ask only if the user signals a preference]** render-time default is Paper; see §1 for how to apply an explicit request.
 
 ### Compliance check (HIPAA / PCI)
 
@@ -272,14 +272,14 @@ This skill is modular — new products, languages, and customer engagements shou
 - `templates/agenda-template.html` — base deck shell (CSS, JS, slide structure) with `{{PLACEHOLDER}}` tokens. Always start from this file. Theme, print, and navigation JS live here; don't override.
 - `templates/implementation-slide-tabbed.html` — Overview + Steps partials for one journey. Duplicate per journey when a build log is included.
 - `templates/twilio-components-slide.html` — the canonical Paper-style Twilio components slide. Drop in between Prerequisites and Journeys only on explicit user request.
-- `templates/mermaid-setup.html` — Mermaid initializer (ESM from jsDelivr, `mermaid@11`) with the Paper palette baked into `themeVariables`. Drop once per deck.
+- `templates/mermaid-setup.html` — Mermaid initializer (ESM from jsDelivr, `mermaid@11`). Reads the Paper/Ink palette from the deck's CSS variables and re-renders on theme flip. Drop once per deck.
 
 **References (read on demand):**
 - `references/twilio-products.md` — product identity (TAC, Orchestrator, ConversationRelay, Memory, CI), native behaviors that must not be re-wrapped, Twilio-native data-shipping mechanisms, and the customer-domain tool-body rule. Read before drafting any journey or implementation step.
 - `references/twilio-components-slide.md` — visual-style rules, layout coordinates, numeric verification gate for the hand-rolled SVG, and worked examples. Read before drafting a Twilio components slide.
 - `references/agenda-rules.md` — block types, required structure, timing rules, build-block coverage, in-person/virtual/hybrid variants. Read before drafting the Agenda slides.
 - `references/implementation-slides.md` — Overview/Steps structure, impl-step shape rules, code-panel and screenshot-panel rules, phone-provisioning → Console-screenshot pairing. Read before drafting an Implementation pair.
-- `references/sierra-reference/` — vendored copies of the SAA team's internal "Twilio API Explorer" (`pages/*.py`). Canonical reference for current Twilio API call shapes. See its `README.md` for the file-to-product mapping and the strip-Streamlit rule.
+- `references/twilio-api-reference/` — vendored call-shape snapshots from the SAA team's "Twilio API Explorer" (`pages/*.py`). Canonical reference for current Twilio API call shapes. See its `README.md` for the file-to-product mapping and the strip-Streamlit rule.
 
 **Snippets (reusable code):**
 - `snippets/{language}/` — reusable code snippets, one file per product/pattern, named `{product}-{action}.{ext}` (lowercase-kebab). **Each language directory has a `README.md` index** listing every snippet by product + action with its symbols/endpoints. Before writing a snippet, read that README; if a match exists, copy the file into the code panel verbatim.

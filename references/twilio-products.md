@@ -12,7 +12,7 @@ Read before drafting any journey or implementation step that touches TAC, Conver
 
 Refer to the customer's side as "your integration app" or "your application" — never "the Orchestrator" (which is the Twilio product).
 
-**Python surface** (cross-check `pages/actions.py` in sierra-test before drafting):
+**Python surface** (cross-check `references/twilio-api-reference/actions.py` before drafting):
 
 - `TAC(config=TACConfig.from_env())` — SDK instance; single per app. Reads `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`, `TWILIO_VOICE_PUBLIC_DOMAIN`, CI/Memory config IDs from env.
 - `SMSChannel(tac, config=SMSChannelConfig(memory_mode="always"))` — SMS channel; `memory_mode="always"` enables Twilio Memory hydration on every turn.
