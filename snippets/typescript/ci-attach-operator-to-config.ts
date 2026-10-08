@@ -1,14 +1,13 @@
 // Attach a Language Operator to an Intelligence Configuration.
 //
-// PUT on a Configuration silently creates an inactive version — so the
-// reliable path is DELETE + POST to recreate the config with the merged
-// rules. The new config ID is different; update any external references
-// (e.g. Conversation Orchestrator intelligenceConfigurationIds) to point
-// at it.
+// PUT /v3/ControlPlane/Configurations/{id} requires the full configuration
+// body (displayName, rules, ...) — any field you omit is cleared. Fetch the
+// current config first, append the new rule, then PUT the merged object
+// back.
 //
-// A rule binds an operator to a trigger (COMMUNICATION with throttle,
-// CONVERSATION_END, or CONVERSATION_INACTIVE) and posts results to a
-// webhook action.
+// A rule binds operators to a trigger (COMMUNICATION with optional
+// throttle count, CONVERSATION_END, or CONVERSATION_INACTIVE) and posts
+// results to a webhook action.
 
 const INTEL_BASE = 'https://intelligence.twilio.com/v3';
 const accountSid = process.env.TWILIO_ACCOUNT_SID!;
@@ -17,9 +16,10 @@ const authHeader = 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString
 
 interface Rule {
   id?: string;
-  operators: Array<{ id: string }>;
+  operators: Array<{ id: string; parameters?: Record<string, unknown> }>;
   triggers: Array<{ on: string; parameters?: { count: number } }>;
-  actions: Array<{ type: 'WEBHOOK'; method: 'POST'; url: string }>;
+  actions: Array<{ type: 'WEBHOOK'; method: 'POST' | 'GET'; url: string }>;
+  context?: Record<string, unknown>;
 }
 
 interface Configuration {
@@ -28,11 +28,6 @@ interface Configuration {
   description?: string | null;
   rules?: Rule[];
 }
-
-const stripRuleIds = (rule: Rule): Rule => {
-  const { id: _id, ...rest } = rule;
-  return rest;
-};
 
 export async function attachOperatorRule(args: {
   configId: string;
@@ -60,28 +55,20 @@ export async function attachOperatorRule(args: {
     triggers: [trigger],
     actions: [{ type: 'WEBHOOK', method: 'POST', url: args.webhookUrl }],
   };
-  const rules = [...(current.rules ?? []), newRule];
 
-  const delResp = await fetch(`${INTEL_BASE}/ControlPlane/Configurations/${args.configId}`, {
-    method: 'DELETE',
-    headers: { Authorization: authHeader },
-  });
-  if (!delResp.ok && delResp.status !== 404) {
-    throw new Error(`Delete config failed: ${delResp.status} ${await delResp.text()}`);
-  }
-
-  const createBody: Configuration = {
-    displayName: current.displayName ?? 'Config',
+  const updateBody: Configuration = {
+    displayName: current.displayName,
     ...(current.description ? { description: current.description } : {}),
-    rules: rules.map(stripRuleIds),
+    rules: [...(current.rules ?? []), newRule],
   };
-  const createResp = await fetch(`${INTEL_BASE}/ControlPlane/Configurations`, {
-    method: 'POST',
+
+  const putResp = await fetch(`${INTEL_BASE}/ControlPlane/Configurations/${args.configId}`, {
+    method: 'PUT',
     headers: { Authorization: authHeader, 'Content-Type': 'application/json' },
-    body: JSON.stringify(createBody),
+    body: JSON.stringify(updateBody),
   });
-  if (!createResp.ok) {
-    throw new Error(`Recreate config failed: ${createResp.status} ${await createResp.text()}`);
+  if (!putResp.ok) {
+    throw new Error(`Update config failed: ${putResp.status} ${await putResp.text()}`);
   }
-  return createResp.json() as Promise<Configuration>;
+  return putResp.json() as Promise<Configuration>;
 }

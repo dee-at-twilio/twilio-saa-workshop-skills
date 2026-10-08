@@ -1,6 +1,6 @@
 ---
 name: twilio-saa-workshop
-description: Use ONLY when the user explicitly asks to generate, build, or create a customer technical workshop/hackathon agenda as an HTML file, in the "Paper" warm/editorial branded format. Trigger phrases include "build a workshop agenda", "create the workshop HTML", "generate a [1/2/3]-day workshop brief", "workshop/hackathon agenda for [customer]". Do NOT use for generic presentations, non-workshop customer documents, PDF/PPTX output, or requests that don't specify HTML workshop agenda output.
+description: Use ONLY when the user explicitly asks to generate, build, or create a customer technical workshop/hackathon agenda as an HTML file, in the "Paper" warm/editorial branded format (light default, with an "Ink" dark variant). Trigger phrases include "build a workshop agenda", "create the workshop HTML", "generate a [1/2/3]-day workshop brief", "workshop/hackathon agenda for [customer]". Do NOT use for generic presentations, non-workshop customer documents, PDF/PPTX output, or requests that don't specify HTML workshop agenda output.
 ---
 
 # Twilio Workshop Agenda Generator
@@ -8,6 +8,12 @@ description: Use ONLY when the user explicitly asks to generate, build, or creat
 Produces a single self-contained HTML file for a technical workshop/hackathon agenda, presented as a **paginated slide deck** — one full-viewport section per screen, Next/Prev buttons plus arrow-key navigation, a dot indicator, a slide counter, and a collapsible left-hand slide menu (open by default).
 
 Visual identity is **"Paper"** — warm cream background, Fraunces serif headings paired with IBM Plex Sans body text and IBM Plex Mono for timestamps/labels/code, a dotted timeline, and a tilted stamp-style section label (`.eyebrow`). Color-coded session types: talk = dusty blue, build = terracotta (primary accent), planning = ochre, retro = violet.
+
+A warm dark counterpart, **"Ink"**, ships alongside Paper. Same typography, same four-accent role system, same dotted detail — substrate shifts to warm charcoal and accents brighten a touch so they still read warm, not neon. Both themes live in the one template; a toolbar toggle (☾/☀) flips between them in-page, and the choice persists via `localStorage`. First-load default is Paper, unless the viewer's OS prefers dark or they picked Ink previously.
+
+**Picking a theme at generation time.** If the user asks for "light" / "paper" / "the usual theme", leave `<body class="menu-open">` and `<html>` as-is (Paper is default). If they ask for "dark" / "ink" / "dark mode", render the deck with `<html data-theme="dark">` so it opens on Ink. Either way the toggle is present and the viewer can switch.
+
+**Known Ink gap — Twilio components SVG and Mermaid diagrams.** The hand-rolled SVG in `templates/twilio-components-slide.html` and the `themeVariables` block in `templates/mermaid-setup.html` bake Paper hex values into inline styles / init options; they do not pick up the `[data-theme="dark"]` CSS variables. When Ink is active those two pieces still render in Paper palette. If a deck is being generated in Ink and includes either slide, call this out to the user before saving.
 
 Navigation is buttons and arrow keys only (no wheel/scroll-to-advance). Long slides scroll internally via plain `overflow-y: auto`. Theme, print behavior, and navigation JS all live in `templates/agenda-template.html` — don't override.
 
@@ -75,6 +81,7 @@ For every item: if the user names it, use it; if a short placeholder can be auto
 7. **Agenda only, or agenda + implementation build log?** **[required]** If build log: for each journey, ask what was actually built — steps, snippets, screenshots worth preserving. Never invent plausible "what we built" content.
 8. **Engagement framing** — **[ask only if ambiguous]** kicks off or continues a longer engagement? Any prior work to recap?
 9. **Meals / social event** — **[ask only if applicable]** only include if confirmed.
+10. **Theme — Paper (light) or Ink (dark)** — **[default: Paper]** only honour an explicit request. Set `<html data-theme="dark">` on render if Ink was asked for; the toolbar toggle lets the viewer flip either way. Do not ask by default.
 
 ### Compliance check (HIPAA / PCI)
 

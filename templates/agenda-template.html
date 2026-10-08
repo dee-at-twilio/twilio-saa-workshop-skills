@@ -8,8 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   /*
-    "Paper" theme — shared across every workshop agenda this skill produces.
-    Do not restyle per-customer; only content changes between agendas.
+    Themes — "Paper" (light, default) and "Ink" (warm dark counterpart).
+    Both share the same typography, dotted-rule treatment, and four-accent
+    role system (terracotta / dusty-blue / ochre / violet). Only content
+    changes between agendas; themes are chosen per-render via <html data-theme>
+    and can be flipped in-page by the toolbar toggle.
   */
   :root {
     --bg: #F5EFE3;
@@ -19,12 +22,29 @@
     --dusty-blue: #4E7089;  --dusty-blue-soft: rgba(78,112,137,0.12);
     --ochre: #A87A21;       --ochre-soft: rgba(168,122,33,0.13);
     --violet: #7A6A9E;      --violet-soft: rgba(122,106,158,0.12);
+    --link-border: rgba(181,80,46,0.35);
     --text: #2B241E;
     --text-dim: #6C5F51;
     --text-faint: #A89A87;
     --font-h: 'Fraunces', Georgia, serif;
     --font-b: 'IBM Plex Sans', sans-serif;
     --font-m: 'IBM Plex Mono', monospace;
+  }
+
+  /* Ink — warm dark counterpart. Substrate shifts to warm charcoal; accents
+     brighten a touch so they carry on dark without going neon. */
+  html[data-theme="dark"] {
+    --bg: #1A1611;
+    --bg-alt: #221C16;
+    --line: rgba(245,239,227,0.14);
+    --terracotta: #E07B57;  --terracotta-soft: rgba(224,123,87,0.14);
+    --dusty-blue: #8CB3CF;  --dusty-blue-soft: rgba(140,179,207,0.14);
+    --ochre: #D9A647;       --ochre-soft: rgba(217,166,71,0.15);
+    --violet: #B5A4D8;      --violet-soft: rgba(181,164,216,0.14);
+    --link-border: rgba(224,123,87,0.4);
+    --text: #F0E8D8;
+    --text-dim: #B8AC98;
+    --text-faint: #7A6F5E;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
@@ -41,6 +61,22 @@
     transition: left 0.3s ease;
   }
   .toolbar .brand { font-family: var(--font-m); font-size: 12.5px; color: var(--text-faint); }
+
+  /* Theme toggle — same visual language as the nav/menu buttons. */
+  .theme-toggle {
+    width: 38px; height: 38px; border-radius: 50%;
+    border: 1.5px solid var(--line); background: var(--bg-alt); color: var(--text);
+    font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s ease, background 0.3s ease, color 0.3s ease;
+  }
+  .theme-toggle:hover { border-color: var(--terracotta); }
+  .theme-toggle .icon-sun { display: none; }
+  .theme-toggle .icon-moon { display: block; }
+  html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+  html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+  body, .toolbar, .deck-nav, .side-menu, .nav-btn, .theme-toggle, .side-menu-toggle {
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
 
   /* ---------- Collapsible slide menu (left side) ----------
      Default OPEN. On wide screens an open menu pushes the toolbar,
@@ -136,7 +172,7 @@
      Twilio-components recap, and any other prose that embeds a link. */
   .p-desc a, .lede a, .components-recap a {
     color: var(--terracotta); text-decoration: none;
-    border-bottom: 1px solid rgba(181,80,46,0.35);
+    border-bottom: 1px solid var(--link-border);
   }
   .p-desc a:hover, .lede a:hover, .components-recap a:hover { border-bottom-color: var(--terracotta); }
 
@@ -298,6 +334,18 @@
     }
   }
 </style>
+<script>
+  // Pre-paint theme init — read saved pref or OS setting before the body renders
+  // so there is no flash of the wrong theme. Default is Paper (light).
+  (function () {
+    try {
+      var saved = localStorage.getItem('agenda-theme');
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var theme = saved || (prefersDark ? 'dark' : 'light');
+      if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    } catch (e) { /* localStorage unavailable — fall through to default (light) */ }
+  })();
+</script>
 </head>
 <body class="menu-open">
 
@@ -311,6 +359,10 @@
 
 <div class="toolbar">
   <div class="brand">{{WORKSHOP_TITLE}} — Workshop Agenda</div>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light / dark theme" title="Toggle theme">
+    <span class="icon-moon" aria-hidden="true">☾</span>
+    <span class="icon-sun" aria-hidden="true">☀</span>
+  </button>
 </div>
 
 <div class="viewport" id="viewport">
@@ -554,6 +606,23 @@
   });
 
   goTo(0);
+
+  // Theme toggle — flips [data-theme] on <html> and persists the choice.
+  // Pre-paint init in <head> already applied the stored/OS pref.
+  (function () {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        try { localStorage.setItem('agenda-theme', 'light'); } catch (e) {}
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        try { localStorage.setItem('agenda-theme', 'dark'); } catch (e) {}
+      }
+    });
+  })();
 </script>
 
 </body>

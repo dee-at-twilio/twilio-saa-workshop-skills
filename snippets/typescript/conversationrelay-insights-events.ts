@@ -1,8 +1,13 @@
 // Fetch ConversationRelay runtime events from Voice Insights.
-// GET /v1/Voice/Calls/{callSid}/Events returns the full event stream for the
-// call; CR-specific event names cover prompt_sent, token-received, STT/TTS
+// GET /v1/Voice/{CallSid}/Events returns the full event stream for the call;
+// CR-specific event names cover prompt_sent, token-received, STT/TTS
 // latency, and speech-boundary markers. Useful for post-call turn-by-turn
 // inspection and latency dashboards.
+//
+// CR events are emitted at the carrier_edge. For PSTN calls that's the
+// default edge, but Client/SIP calls default to a different edge, so pass
+// Edge=carrier_edge to get CR events back. Voice Insights Advanced
+// Features must be active on the account.
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID!;
 const authToken = process.env.TWILIO_AUTH_TOKEN!;
@@ -19,7 +24,12 @@ export const CR_EVENT_NAMES = new Set([
   'start_of_agent_speech',
   'end_of_agent_speech',
   'interrupt',
+  'preempted',
+  'dtmf',
+  'digit',
+  'play_media',
   'configurations',
+  'language_changed',
   'call_wrap_up',
 ]);
 
@@ -32,7 +42,7 @@ interface InsightsEvent {
 }
 
 export async function fetchCrEvents(callSid: string): Promise<InsightsEvent[]> {
-  const url = `https://insights.twilio.com/v1/Voice/Calls/${callSid}/Events`;
+  const url = `https://insights.twilio.com/v1/Voice/${callSid}/Events?Edge=carrier_edge`;
   const resp = await fetch(url, { headers: { Authorization: authHeader } });
   if (!resp.ok) return [];
   const body = (await resp.json()) as { events?: InsightsEvent[] };

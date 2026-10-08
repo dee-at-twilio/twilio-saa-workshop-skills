@@ -82,7 +82,7 @@ missing variable fails fast when the module loads.
 ### Conversation Intelligence
 
 - [`ci-create-custom-operator.ts`](ci-create-custom-operator.ts) — `POST /v3/ControlPlane/Operators` with displayName, prompt, outputFormat (TEXT/CLASSIFICATION/JSON), optional parameters/outputSchema/trainingExamples, and `context.memory.enabled`
-- [`ci-attach-operator-to-config.ts`](ci-attach-operator-to-config.ts) — attach a rule binding operator → trigger → webhook action, using the DELETE + POST workaround for the "PUT silently deactivates" quirk
+- [`ci-attach-operator-to-config.ts`](ci-attach-operator-to-config.ts) — attach a rule binding operator → trigger → webhook action via `PUT /v3/ControlPlane/Configurations/{id}` with the merged rules list
 - [`post-call-batch-trigger.ts`](post-call-batch-trigger.ts) — call-status webhook enqueueing a keyed batch job on `completed` instead of running analysis inline
 
 ### Conversation Memory

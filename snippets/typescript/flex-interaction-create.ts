@@ -33,7 +33,6 @@ export async function createOutboundSmsInteraction(args: {
         queue_sid: queueSid,
         worker_sid: workerSid,
         task_channel_unique_name: 'chat',
-        media_channel_sid: args.conversationSid,
         attributes: {
           customerName: args.customerName,
           from: args.fromNumber,
